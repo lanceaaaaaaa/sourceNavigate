@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../js/jquery-2.2.3.min.js"></script>
+    <script type="text/javascript" src="../js/artDialog.js"></script>
+    <script type="text/javascript" src="../js/common.js"></script>
+    <link rel="stylesheet" href="../css/artDialog.css">
+    <script>
+        $(function () {
+            $("#saveNote").click(function(){
+                top.dialog({
+                    id: 'edit',
+                    url : '/note/toEdit?option=1',
+                    width: 900,
+                    height:600,
+                    type:'GET',
+                    title:'节点编辑框',
+                    onclose:function(){
+                        console.log(this.returnValue);
+                        window.opener.handleNote( this.returnValue );
+                        window.close();
+
+                    }
+                }).showModal();
+            });
+            $("#editNote").click(function(){
+                top.dialog({
+                    id: 'edit',
+                    url : '/note/toEdit?option=2&noteId='+$("#noteId").val(),
+                    width: 900,
+                    height:600,
+                    type:'GET',
+                    title:'节点编辑框',
+                    onclose:function(){
+                        console.log(this.returnValue);
+                        window.opener.handleNote( this.returnValue );
+                        window.close();
+                    }
+                }).showModal();
+            });
+            $("#delNote").click(function(){
+                top.dialog({
+                    title: "操作提示",
+                    content: '确定删除？',
+                    okValue: "确定",
+                    width: 200,
+                    ok: function () {
+                        window.opener.handleNote('{"option" : "3"}');
+                        window.close();
+                    }
+                }).showModal();
+            });
+            $("#saveAllNotes").click(function(){
+                top.dialog({
+                    title: "操作提示",
+                    content: '确定保存所有节点信息？',
+                    okValue: "确定",
+                    width: 200,
+                    ok: function () {
+                        window.opener.handleNote('{"option" : "4"}');
+                        window.close();
+                    }
+                }).showModal();
+            });
+            $("#addChildNavigate").click(function(){
+                top.dialog({
+                    title: "操作提示",
+                    content: '确定新增子导航？',
+                    okValue: "确定",
+                    width: 200,
+                    ok: function () {
+                        window.close();
+                        window.opener.handleNote('{"option" : "5"}');
+                    }
+                }).showModal();
+            });
+            $("#queryEle").click(function(){
+                top.dialog({
+                    id: 'query',
+                    url : '/note/toQuery?rootId=[[${noteModel.rootId}]]',
+                    width: 1300,
+                    height:800,
+                    type:'GET',
+                    title:'节点查询框',
+                    onclose:function(){
+                        console.log(this.returnValue);
+                        window.opener.handleNote( this.returnValue );
+                        window.close();
+                    }
+                }).showModal();
+            });
+            $("#deletEle").click(function(){
+
+                        window.close();
+                        window.opener.handleNote('{"option" : "10"}');
+            });
+
+            //显示过长内容
+            var longContent = '[[${noteModel.noteContent}]]';
+            var brCount = getStrAppear(longContent,'&lt;br/&gt;');
+            if(brCount > 10){
+                document.getElementById('longContent').innerHTML = "节点内容：<br />"+longContent.replace(/\&lt\;br\/\&gt\;/g, "<br />");
+            }
+        });
+
+    </script>
+</head>
+<body>
+    <table>
+        <tr>
+            <td>
+                <input id="saveNote" type="button" value="新增节点">
+                <input type="hidden" id="noteId" th:value="${noteModel.noteId}">
+                <input type="hidden" id="notex" th:value="${noteModel.notex}">
+                <input type="hidden" id="notey" th:value="${noteModel.notey}">
+            </td>
+            <td><input id="editNote" type="button" value="编辑节点"></td>
+            <td><input id="delNote" type="button" value="删除节点"></td>
+            <td><input id="saveAllNotes" type="button" value="保存所有节点信息"></td>
+            <td><input id="addChildNavigate" type="button" value="新增子导航"></td>
+            <td><input id="queryEle" type="button" value="查询元素"></td>
+            <td><input id="deletEle" type="button" value="删除元素"></td>
+        </tr>
+    </table>
+<div id="longContent"></div>
+</body>
+</html>

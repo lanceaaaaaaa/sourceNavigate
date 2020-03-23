@@ -1,0 +1,250 @@
+<!DOCTYPE>
+<html>
+<head>
+    <title>根导航页面</title>
+
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
+    <script src="../js/jquery-2.2.3.min.js"></script>
+    <script src="../js/cytoscape.min.js"></script>
+
+    <!-- for testing with local version of cytoscape.js -->
+    <!--<script src="../cytoscape.js/build/cytoscape.js"></script>-->
+
+    <script src="../js/popper.js"></script>
+    <script src="../js/cytoscape-popper.js"></script>
+
+    <script src="../js/tippy-bundle.iife.min.js"></script>
+    <script type="text/javascript" src="../js/artDialog.js"></script>
+    <script type="text/javascript" src="../js/popper.js"></script>
+    <script type="text/javascript" src="../js/common.js"></script>
+    <script type="text/javascript" src="../js/note.js"></script>
+    <link rel="stylesheet" href="../css/tippy.css" />
+    <link rel="stylesheet" href="../css/artDialog.css">
+
+    <style>
+        body {
+            font-family: helvetica neue, helvetica, liberation sans, arial, sans-serif;
+            font-size: 14px
+        }
+
+        #cy {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            z-index: 1;
+        }
+
+        h1 {
+            opacity: 0.5;
+            font-size: 1em;
+            font-weight: bold;
+        }
+
+        /* makes sticky faster; disable if you want animated tippies */
+        .tippy-popper {
+            transition: none !important;
+        }
+    </style>
+
+    <script>
+        var node;
+        $.ajax({
+            url:"/note/getNoteList",
+            type:'post',
+            cache:false,
+            async: false,
+            dataType:'json',
+            contentType: "application/x-www-form-urlencoded; charset=utf-8",
+            data: {'rootId': 'n0'},
+            success:function(result){
+                console.log(result);
+                showNote(result);
+            }
+        });
+    function showNote(result){
+        var firstId = "";
+        var firstContent = "";
+        var firstNotex;
+        var firstNotey;
+        for(var i=0; i<result.length;i++){
+            if(result[i].sourceId == null || result[i].sourceId == ''){
+                firstId = result[i].noteId;
+                firstContent = result[i].noteContent;
+                firstNotex = result[i].notex;
+                firstNotey = result[i].notey;
+            }
+        }
+        document.addEventListener('DOMContentLoaded', function () {
+            var cy = window.cy = cytoscape({
+                container: document.getElementById('cy'),
+                style: [
+                    {
+                        selector: 'node',
+                        style: {
+                            'content': 'data(id)',
+                            'text-valign': 'center',
+                            'text-halign': 'center'
+                        }
+                    },
+                    {
+                        selector: 'edge',
+                        style: {
+                            'curve-style': 'bezier',
+                            'target-arrow-shape': 'triangle'
+                        }
+                    }
+                ],
+                elements: {
+                    nodes: [{ data: { id: firstId } , position: { x: firstNotex, y: firstNotey } }]
+                },
+                layout: {
+                    name: 'grid'
+                }
+            });
+
+            var firstNote = cy.getElementById(firstId);
+            var tippyFirstNote = makeTippy(firstNote, firstContent);
+            tippyFirstNote.show();
+
+            for(var i=0; i<result.length;i++){
+                if(result[i].sourceId != null){
+                    var eles = cy.add([
+                        { group: 'nodes', data: { id: result[i].noteId}, position: { x: result[i].notex, y: result[i].notey }},
+                        { group: 'edges', data: { id: result[i].noteId+result[i].sourceId, source: result[i].sourceId, target: result[i].noteId } }
+                    ]);
+                    var addNote = cy.getElementById(result[i].noteId);
+                    var brCount = getStrAppear(result[i].noteContent,'<br/>');
+                    var tippyAddNote;
+                    if(brCount > 10){
+                        tippyAddNote = makeTippy(addNote, result[i].noteContent.split('<br/>')[0],result[i].contentEleId);
+                    }else{
+                        tippyAddNote = makeTippy(addNote, result[i].noteContent,result[i].contentEleId);
+                    }
+                    tippyAddNote.show();
+                }
+            }
+
+            cy.on('tap', 'node', function(evt){
+                node = evt.target;
+                console.log( 'tapped ' + node.id() + 'x:'+node.position().x);
+                var winObj = window.open('/note/toSelectOption?noteId=' + node.id());
+            });
+        });
+    }
+
+    function handleNote(returnValue) {
+        if(returnValue){
+            var jsonObj = JSON.parse(returnValue);
+            //新增节点
+            if(jsonObj.option == '1'){
+                var noteX=node.position().x + 100;
+                var noteY=node.position().y + 100;
+                $.ajax({
+                    url:"/note/saveOrUpdateNote",
+                    type:'post',
+                    cache:false,
+                    async: false,
+                    dataType:'json',
+                    contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                    data: {'noteContent': jsonObj.content.replace(/\r\n/g,"<br/>"),'noteFrom': '','notex': noteX,'notey': noteY,'sourceId': node.id(),'targetId': '','rootId':'n0'},
+                    success:function(result){
+                        //alert('id:'+result.data.noteId+'sourceid:'+node.id());
+                        cy.add([
+                            { group: 'nodes', data: { id: result.data.noteId}, position: { x: noteX, y: noteY }},
+                            { group: 'edges', data: { id: result.data.noteId+node.id(), source: node.id(), target: result.data.noteId } }
+                        ]);
+                        var addNote = cy.getElementById(result.data.noteId);
+                        var brCount = getStrAppear(result.data.noteContent,'<br/>');
+                        var tippyAddNote;
+                        if(brCount > 10){
+                            tippyAddNote = makeTippy(addNote, result.data.noteContent.split('<br/>')[0],result.data.contentEleId);
+                        }else{
+                            tippyAddNote = makeTippy(addNote, result.data.noteContent,result.data.contentEleId);
+                        }
+                        tippyAddNote.show();
+                    }
+                });
+            //编辑节点
+            }else if(jsonObj.option == '2'){
+                $.ajax({
+                    url:"/note/saveOrUpdateNote",
+                    type:'post',
+                    cache:false,
+                    async: false,
+                    dataType:'json',
+                    contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                    data: {'noteContent': jsonObj.content.replace(/\r\n/g,"<br/>"),'noteId': node.id(),'noteFrom': '','notex': node.position().x,'notey': node.position().y,'targetId': ''},
+                    success:function(result){
+                        console.log("edit"+result);
+                        //alert('noteId'+result.data.noteId+'noteContent'+result.data.noteContent);
+                       var brCount = getStrAppear(result.data.noteContent,'<br/>');
+                        if(brCount > 10){
+                            document.getElementById("div"+node.id().substring(1)).innerHTML = '<p>'+result.data.noteContent.split('<br/>')[0]+'</p>';
+                        }else{
+                            document.getElementById("div"+node.id().substring(1)).innerHTML = '<p>'+result.data.noteContent+'</p>';
+                        }
+                    }
+                });
+            //删除节点
+            }else if(jsonObj.option == '3'){
+                $.ajax({
+                    url:"/note/delNote",
+                    type:'post',
+                    cache:false,
+                    async: false,
+                    dataType:'json',
+                    contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                    data: {'noteId': node.id()},
+                    success:function(result){
+                        alert(result.message);
+                    }
+                });
+            //保存所有节点
+            }else if (jsonObj.option == '4') {
+                var allNodes = cy.nodes();
+                var nodeList = [];
+                for(var j=0;j<allNodes.length;j++){
+                    //alert('id:'+allNodes[j].id()+'x:'+allNodes[j].position().x+'y:'+allNodes[j].position().y);
+                    var sendNode = {};
+                    sendNode.noteId = allNodes[j].id();
+                    sendNode.notex = Math.floor((allNodes[j].position().x)*100) / 100;
+                    sendNode.notey = Math.floor((allNodes[j].position().y)*100) / 100;
+                    nodeList.push(sendNode);
+                }
+                $.ajax({
+                    url:"/note/saveAllNotes",
+                    type:'post',
+                    cache:false,
+                    async: false,
+                    dataType:'json',
+                    contentType: 'application/json',
+                    data:  JSON.stringify(nodeList),
+                    success:function(result){
+                        console.log(result);
+                    }
+                });
+            }else if(jsonObj.option == '5'){
+                window.location.href='/note/toChild?rootId='+node.id();
+            }else if(jsonObj.option == '6'){
+                console.log(jsonObj);
+                toSelectNote(node.id(),jsonObj.noteId);
+            }else if(jsonObj.option == '10') {
+                //document.querySelector("#div15").scrollIntoView();
+                // 定位
+                //queryNote.move("{ id: n15}, position: { x: 960, y: 472 }}");
+
+
+            }
+        }
+    }
+    </script>
+</head>
+
+<body>
+<h1>cytoscape-popper tippy demo</h1>
+<div id="cy"></div>
+</body>
+
+</html>
