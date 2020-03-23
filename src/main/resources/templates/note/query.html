@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../js/jquery-2.2.3.min.js"></script>
+    <script type="text/javascript" src="../js/artDialog.js"></script>
+    <script type="text/javascript" src="../js/common.js"></script>
+    <script type="text/javascript" src="../js/jquery.easyui.min.js"></script>
+    <link rel="stylesheet" href="../css/artDialog.css">
+    <link rel="stylesheet" href="../css/easyui.css">
+    <script type="text/javascript" th:inline="none">
+        $(function () {
+            $("#queryNote").click(function(){
+                $('#queryTable').datagrid({
+                    nowrap: false,
+                    autoRowHeight: false,
+                    loadMsg:'正在加载数据,请稍后...',
+                    striped: true,
+                    collapsible:false,
+                    url: '../note/getNoteList?queryContent='+$("#queryContent").val(),
+                    remoteSort: false,
+                    fitcolumns: true,
+                    singleSelect: true,
+                    resizable: false,
+                    singleSelect: true,
+                    width : document.body.clientWidth-50 ,
+                    height : 300,
+                    striped:true,
+                    pageSize:10,
+                    columns:[[
+                        {field : 'noteId',title:'节点名称',align:'center', width:'10%'},
+                        {field : 'noteFrom',title:'节点由来',align:'center', width:'10%'},
+                        {field : 'sourceId',title:'节点上一节点',align:'center', width:'10%'},
+                        {field : 'sourceId',title:'节点上一节点',align:'center', width:'10%'},
+                        {field : 'rootId',title:'节点所在根节点',align:'center', width:'10%'},
+                        {field : 'operation',title:'操作',align:'center', width:'10%'
+                                ,'formatter': function(value, row, index) {
+                                        return '<a href="javascript:void(0);" style="text-decoration: none;" onclick="showNoteContent(\''+row.noteId+'\');">查看节点信息</a>';
+                                },
+                        }
+                    ]],
+                    pagination:true,
+                    rownumbers:true,
+                    onDblClickRow :function(rowIndex,rowData){
+
+                        //alert("双击"+rowData.noteId+rowData.rootId+"sendRootId:"+$("#rootId").val());
+                        //查询到的节点是否在此页面
+                        if(rowData.rootId == $("#rootId").val()){
+                            var dialog = getDialog();
+                            dialog.close('{"option" : "6","noteId" : "'+rowData.noteId+'","rootId" : "'+rowData.rootId+'"}'); // 关闭（隐藏）对话框
+                            dialog.remove(); // 主动销毁对话框
+                            return false;
+                        }else{
+                            //不是在此页面，先跳转到页面
+
+
+
+                        }
+                    }
+                });
+            });
+        });
+        function showNoteContent(noteId) {
+            //alert(noteId);
+            $.ajax({
+                url:"/note/getNoteList",
+                type:'post',
+                cache:false,
+                async: false,
+                dataType:'json',
+                contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                data: {'noteId': noteId},
+                success:function(result){
+                    var conIframeInstanece = $("#conIframe");
+                    if(conIframeInstanece != undefined){
+                        conIframeInstanece.remove();
+                    }
+                    var _frame = $('<iframe style="width: 800px;height: 300px;" scrolling="auto" id="conIframe" scrolling="no" border="0" frameborder="0" name="Export-frame"></iframe>');
+                    _frame.appendTo('body');
+                    var conDiv = $("<div>"+"<div>节点内容：<br />"+result[0].noteContent.replace(/\&lt\;br\/\&gt\;/g, "<br />")+"</div>");
+                    $("#conIframe").contents().find("body").append(conDiv);
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+    <table>
+        <tr>
+            <td>
+                <input type="hidden" id="rootId" th:value="${noteModel.rootId}">
+                <input id="queryContent" style="width: 200px;" name="queryContent" type="text">
+            </td>
+            <td>
+                <input id="queryNote" type="button" value="查询">
+            </td>
+        </tr>
+    </table>
+    <table id="queryTable"></table>
+</body>
+</html>
