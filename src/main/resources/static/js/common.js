@@ -12,7 +12,7 @@ function form2JsonString(formId) {
 }
 
 
-function makeTippy(node, text, contentEleId){
+function makeTippy(node, text, contentEleId, hasDetail){
     var ref = node.popperRef();
 
     // unfortunately, a dummy element must be passed
@@ -34,6 +34,9 @@ function makeTippy(node, text, contentEleId){
             var div = document.createElement('div');
             div.innerHTML = text;
             div.id = contentEleId;
+            if(hasDetail){
+                div.style.background="blue";
+            }
             return div;
         },
 

@@ -134,7 +134,7 @@
                             var brCount = getStrAppear(result[i].noteContent,'<br/>');
                             var tippyAddNote;
                             if(brCount > 10){
-                                tippyAddNote = makeTippy(addNote, result[i].noteContent.split('<br/>')[0],result[i].contentEleId);
+                                tippyAddNote = makeTippy(addNote, result[i].noteContent.split('<br/>')[0],result[i].contentEleId, true);
                             }else{
                                 tippyAddNote = makeTippy(addNote, result[i].noteContent,result[i].contentEleId);
                             }
