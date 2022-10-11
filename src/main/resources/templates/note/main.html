@@ -66,6 +66,7 @@
     function showNote(result){
         var firstId = "";
         var firstContent = "";
+        var firstContentEleId = "";
         var firstNotex;
         var firstNotey;
         for(var i=0; i<result.length;i++){
@@ -74,6 +75,7 @@
                 firstContent = result[i].noteContent;
                 firstNotex = result[i].notex;
                 firstNotey = result[i].notey;
+                firstContentEleId = result[i].contentEleId;
             }
         }
         document.addEventListener('DOMContentLoaded', function () {
@@ -105,7 +107,7 @@
             });
 
             var firstNote = cy.getElementById(firstId);
-            var tippyFirstNote = makeTippy(firstNote, firstContent);
+            var tippyFirstNote = makeTippy(firstNote, firstContent, firstContentEleId);
             tippyFirstNote.show();
 
             for(var i=0; i<result.length;i++){
@@ -226,7 +228,34 @@
                     }
                 });
             }else if(jsonObj.option == '5'){
-                window.location.href='/note/toChild?rootId='+node.id();
+                var noteX=node.position().x + 100;
+                var noteY=node.position().y + 100;
+                $.ajax({
+                    url:"/note/saveOrUpdateNote",
+                    type:'post',
+                    cache:false,
+                    async: false,
+                    dataType:'json',
+                    contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                    data: {'noteContent': node.id()+'-'+document.getElementById("div"+node.id().substring(1)).innerHTML+'-'+'root','noteFrom': '','notex': noteX,'notey': noteY,'sourceId': '','targetId': '','rootId':node.id()},
+                    success:function(result){
+                        cy.add([
+                            { group: 'nodes', data: { id: result.data.noteId}, position: { x: noteX, y: noteY }},
+                            { group: 'edges', data: { id: result.data.noteId+node.id(), source: node.id(), target: result.data.noteId } }
+                        ]);
+                        var addNote = cy.getElementById(result.data.noteId);
+                        var brCount = getStrAppear(result.data.noteContent,'<br/>');
+                        var tippyAddNote;
+                        if(brCount > 10){
+                            tippyAddNote = makeTippy(addNote, result.data.noteContent.split('<br/>')[0],result.data.contentEleId);
+                        }else{
+                            tippyAddNote = makeTippy(addNote, result.data.noteContent,result.data.contentEleId);
+                        }
+                        tippyAddNote.show();
+
+                        window.location.href='/note/toChild?rootId='+node.id();
+                    }
+                });
             }else if(jsonObj.option == '6'){
                 console.log(jsonObj);
                 toSelectNote(node.id(),jsonObj.noteId);
@@ -235,7 +264,8 @@
                 // 定位
                 //queryNote.move("{ id: n15}, position: { x: 960, y: 472 }}");
 
-
+            }else if(jsonObj.option == '11') {
+                window.location.href='/note/toChild?rootId='+node.id();
             }
         }
     }

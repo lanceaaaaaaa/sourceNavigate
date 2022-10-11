@@ -80,6 +80,7 @@
             function showNote(result){
                 var firstId = "";
                 var firstContent = "";
+                var firstContentEleId = "";
                 var firstNotex;
                 var firstNotey;
                 for(var i=0; i<result.length;i++){
@@ -88,6 +89,7 @@
                         firstContent = result[i].noteContent;
                         firstNotex = result[i].notex;
                         firstNotey = result[i].notey;
+                        firstContentEleId = result[i].contentEleId;
                     }
                 }
                 document.addEventListener('DOMContentLoaded', function () {
@@ -119,7 +121,7 @@
                     });
 
                     var firstNote = cy.getElementById(firstId);
-                    var tippyFirstNote = makeTippy(firstNote, firstContent);
+                    var tippyFirstNote = makeTippy(firstNote, firstContent, firstContentEleId);
                     tippyFirstNote.show();
 
                     for(var i=0; i<result.length;i++){
@@ -129,7 +131,13 @@
                                 { group: 'edges', data: { id: result[i].noteId+result[i].sourceId, source: result[i].sourceId, target: result[i].noteId } }
                             ]);
                             var addNote = cy.getElementById(result[i].noteId);
-                            var tippyAddNote = makeTippy(addNote, result[i].noteContent);
+                            var brCount = getStrAppear(result[i].noteContent,'<br/>');
+                            var tippyAddNote;
+                            if(brCount > 10){
+                                tippyAddNote = makeTippy(addNote, result[i].noteContent.split('<br/>')[0],result[i].contentEleId);
+                            }else{
+                                tippyAddNote = makeTippy(addNote, result[i].noteContent,result[i].contentEleId);
+                            }
                             tippyAddNote.show();
                         }
                     }
@@ -215,6 +223,22 @@
                                 alert(result.message);
                             }
                         });
+                    }else if(jsonObj.option == '5'){
+                        var noteX=node.position().x + 100;
+                        var noteY=node.position().y + 100;
+                        $.ajax({
+                            url:"/note/saveOrUpdateNote",
+                            type:'post',
+                            async:false,
+                            cache:false,
+                            dataType:'json',
+                            data: {'noteContent': node.id()+'-'+document.getElementById("div"+node.id().substring(1)).innerHTML+'-'+'root','noteFrom': '','notex': noteX,'notey': noteY,'sourceId': '','targetId': '','rootId':node.id()},
+                            success:function(result){
+                                window.location.href='/note/toChild?rootId='+node.id();
+                            }
+                        });
+                    }else if(jsonObj.option == '11') {
+                        window.location.href='/note/toChild?rootId='+node.id();
                     }
                 }
             }

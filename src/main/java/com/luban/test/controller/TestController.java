@@ -32,14 +32,14 @@ public class TestController {
     @RequestMapping(value = "toEdit")
     public ModelAndView toEdit(){
         ModelAndView mv = new ModelAndView();
-        mv.setViewName("/edit.html");
+        mv.setViewName("edit.html");
         return  mv;
     }
 
     @RequestMapping(value = "toIndex")
     public ModelAndView toIndex(){
         ModelAndView mv = new ModelAndView();
-        mv.setViewName("/index.html");
+        mv.setViewName("index.html");
         return  mv;
     }
 }

@@ -25,7 +25,7 @@ public class NoteController {
     @RequestMapping("toMain")
     public ModelAndView toMain(){
         ModelAndView mv = new ModelAndView();
-        mv.setViewName("/note/main.html");
+        mv.setViewName("note/main.html");
         return mv;
     }
 
@@ -34,7 +34,7 @@ public class NoteController {
         ModelAndView mv = new ModelAndView();
         NoteModel dataModel = noteService.getNoteList(noteModel).get(0);
         model.addAttribute("noteModel",dataModel);
-        mv.setViewName("/note/selectoption.html");
+        mv.setViewName("note/selectoption.html");
         return  mv;
     }
 
@@ -47,7 +47,7 @@ public class NoteController {
         if(noteList != null && noteList.size() == 1){
             model.addAttribute("noteModel",noteList.get(0));
         }
-        mv.setViewName("/note/edit.html");
+        mv.setViewName("note/edit.html");
         return  mv;
     }
 
@@ -55,7 +55,7 @@ public class NoteController {
     public ModelAndView toQuery(String option,NoteModel noteModel, Model model){
         ModelAndView mv = new ModelAndView();
         model.addAttribute("noteModel",noteModel);
-        mv.setViewName("/note/query.html");
+        mv.setViewName("note/query.html");
         return  mv;
     }
 
@@ -107,7 +107,7 @@ public class NoteController {
     public ModelAndView toChild(NoteModel noteModel, Model model){
         ModelAndView mv = new ModelAndView();
         model.addAttribute("noteModel",noteModel);
-        mv.setViewName("/note/child.html");
+        mv.setViewName("note/child.html");
         return mv;
     }
 }

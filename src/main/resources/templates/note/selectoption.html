@@ -65,16 +65,23 @@
                 }).showModal();
             });
             $("#addChildNavigate").click(function(){
-                top.dialog({
-                    title: "操作提示",
-                    content: '确定新增子导航？',
-                    okValue: "确定",
-                    width: 200,
-                    ok: function () {
-                        window.close();
-                        window.opener.handleNote('{"option" : "5"}');
-                    }
-                }).showModal();
+                var type = $("#addChildNavigate").val();
+                if(type == '新增子导航'){
+                    top.dialog({
+                        title: "操作提示",
+                        content: '确定新增子导航？',
+                        okValue: "确定",
+                        width: 200,
+                        ok: function () {
+                            window.close();
+                            window.opener.handleNote('{"option" : "5"}');
+                        }
+                    }).showModal();
+                }else{
+                    window.opener.handleNote('{"option" : "11"}');
+                    window.close();
+                }
+
             });
             $("#queryEle").click(function(){
                 top.dialog({
@@ -103,6 +110,24 @@
             if(brCount > 10){
                 document.getElementById('longContent').innerHTML = "节点内容：<br />"+longContent.replace(/\&lt\;br\/\&gt\;/g, "<br />");
             }
+
+            $.ajax({
+                url:"/note/getNoteList",
+                type:'post',
+                cache:false,
+                async: false,
+                dataType:'json',
+                contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                data: {'rootId': $("#noteId").val()},
+                success:function(result){
+                    console.log(result);
+                    if(result.length == 0){
+                        $("#addChildNavigate").val("新增子导航");
+                    }else{
+                        $("#addChildNavigate").val("进入子导航");
+                    }
+                }
+            });
         });
 
     </script>
