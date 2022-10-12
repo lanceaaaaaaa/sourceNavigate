@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../../js/jquery-2.2.3.min.js"></script>
+    <script type="text/javascript" src="../../js/artDialog.js"></script>
+    <script type="text/javascript" src="../../js/common.js"></script>
+    <link rel="stylesheet" href="../../css/artDialog.css">
+    <script>
+        $(function(){
+            //回显内容数据
+            var noteContent = '[[${noteModel.noteContent}]]';
+            //document.getElementById('content').value = noteContent.replace(/&lt;br\/&gt;/g,"\\r\\n");
+            $("#content").text(noteContent.replace(/&lt;br\/&gt;/g,"\r\n"));
+            var dialog = getDialog();
+            $('#confirmSumit').on('click', function() {
+                dialog.close(form2JsonString('editForm')); // 关闭（隐藏）对话框
+                dialog.remove(); // 主动销毁对话框
+                return false;
+            });
+        })
+    </script>
+</head>
+<body>
+    <form id="editForm">
+        <table>
+                <tr>
+                    <td>节点内容：</td>
+                    <td>
+                        <input type="hidden" name="option" th:value="${option}">
+                        <textarea id="content" name="content"  rows="30" cols="100">
+
+                        </textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input name="confirmSumit" id="confirmSumit" type="button" value="确定">
+                    </td>
+                </tr>
+        </table>
+    </form>
+</body>
+</html>
