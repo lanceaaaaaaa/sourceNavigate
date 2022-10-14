@@ -123,8 +123,10 @@
                         tippyAddNote = makeTippy(addNote, result[i].noteContent.split('<br/>')[0],result[i].contentEleId);
                     }else{
                         tippyAddNote = makeTippy(addNote, result[i].noteContent,result[i].contentEleId);
+
                     }
                     tippyAddNote.show();
+                    judgeWhetherHaveNote(result[i].noteId, result[i].contentEleId);
                 }
             }
 

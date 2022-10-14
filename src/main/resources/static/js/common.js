@@ -12,7 +12,7 @@ function form2JsonString(formId) {
 }
 
 
-function makeTippy(node, text, contentEleId, hasDetail){
+function makeTippy(node, text, contentEleId, hasDetail, hasNote){
     var ref = node.popperRef();
 
     // unfortunately, a dummy element must be passed
@@ -36,6 +36,9 @@ function makeTippy(node, text, contentEleId, hasDetail){
             div.id = contentEleId;
             if(hasDetail){
                 div.style.background="blue";
+            }
+            if(hasNote){
+                div.style.color="red";
             }
             return div;
         },
@@ -69,3 +72,19 @@ function getStrAppear(str,flagStr) {
     return (str.length-newStr.length)/flagStr.length;
 }
 
+function judgeWhetherHaveNote(noteId, contentEleId){
+    $.ajax({
+        url:"/note/getNoteList",
+        type:'post',
+        cache:false,
+        async: false,
+        dataType:'json',
+        contentType: "application/x-www-form-urlencoded; charset=utf-8",
+        data: {'rootId': noteId},
+        success:function(result){
+            if(result.length > 0){
+                $("#"+contentEleId).css("color", "red");
+            }
+        }
+    });
+}

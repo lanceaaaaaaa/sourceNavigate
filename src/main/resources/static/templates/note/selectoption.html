@@ -106,8 +106,9 @@
 
             //显示过长内容
             var longContent = '[[${noteModel.noteContent}]]';
+            console.log("longContent"+longContent);
             var brCount = getStrAppear(longContent,'&lt;br/&gt;');
-            if(brCount > 10){
+            if(brCount > 0){
                 document.getElementById('longContent').innerHTML = "节点内容：<br />"+longContent.replace(/\&lt\;br\/\&gt\;/g, "<br />");
             }
 

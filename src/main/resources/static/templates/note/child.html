@@ -133,12 +133,13 @@
                             var addNote = cy.getElementById(result[i].noteId);
                             var brCount = getStrAppear(result[i].noteContent,'<br/>');
                             var tippyAddNote;
-                            if(brCount > 10){
+                            if(brCount > 0){
                                 tippyAddNote = makeTippy(addNote, result[i].noteContent.split('<br/>')[0],result[i].contentEleId, true);
                             }else{
                                 tippyAddNote = makeTippy(addNote, result[i].noteContent,result[i].contentEleId);
                             }
                             tippyAddNote.show();
+                            judgeWhetherHaveNote(result[i].noteId, result[i].contentEleId);
                         }
                     }
 
