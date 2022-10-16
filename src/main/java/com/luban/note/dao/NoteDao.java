@@ -16,4 +16,6 @@ public interface NoteDao {
     void delNote(String noteId);
 
     void updateBatchNote(List<NoteModel> updateNoteList);
+
+    void updatePicPath(NoteModel noteModel);
 }

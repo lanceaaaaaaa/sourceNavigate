@@ -11,32 +11,35 @@
         $(function () {
             $("#saveNote").click(function(){
                 top.dialog({
-                    id: 'edit',
                     url : '/note/toEdit?option=1',
-                    width: 900,
-                    height:600,
-                    type:'GET',
                     title:'节点编辑框',
+                    width: 380,
+                    //height:100,
+                    data: $('#input').val(),
                     onclose:function(){
-                        console.log(this.returnValue);
-                        window.opener.handleNote( this.returnValue );
-                        window.close();
+                        top.handleNote(this.returnValue);
+                        top.dialog.get("edit").close();
 
+                    },
+                    oniframeload: function() {
+                        //console.log('iframe ready')
                     }
                 }).showModal();
             });
             $("#editNote").click(function(){
-                top.dialog({
-                    id: 'edit',
-                    url : '/note/toEdit?option=2&noteId='+$("#noteId").val(),
-                    width: 900,
-                    height:600,
-                    type:'GET',
+                var editNote = top.dialog({
+                    id:'editNode',
+                    url:'/note/toEdit?option=2&noteId='+$("#noteId").val(),
                     title:'节点编辑框',
-                    onclose:function(){
-                        console.log(this.returnValue);
-                        window.opener.handleNote( this.returnValue );
-                        window.close();
+                    width: 380,
+                    //height: 120,
+                    data: $('#input').val(), // 给 iframe 的数据
+                    onclose: function() {
+                        top.handleNote(this.returnValue);
+                        top.dialog.get("edit").close();
+                    },
+                    oniframeload: function() {
+                        //console.log('iframe ready')
                     }
                 }).showModal();
             });
@@ -47,8 +50,7 @@
                     okValue: "确定",
                     width: 200,
                     ok: function () {
-                        window.opener.handleNote('{"option" : "3"}');
-                        window.close();
+                        handleNote('{"option" : "3"}');
                     }
                 }).showModal();
             });
@@ -59,8 +61,8 @@
                     okValue: "确定",
                     width: 200,
                     ok: function () {
-                        window.opener.handleNote('{"option" : "4"}');
-                        window.close();
+                        top.handleNote('{"option" : "4"}');
+                        top.dialog.get("edit").close();
                     }
                 }).showModal();
             });
@@ -73,13 +75,13 @@
                         okValue: "确定",
                         width: 200,
                         ok: function () {
-                            window.close();
-                            window.opener.handleNote('{"option" : "5"}');
+                            top.handleNote('{"option" : "5"}');
+                            top.dialog.get("edit").close();
                         }
                     }).showModal();
                 }else{
-                    window.opener.handleNote('{"option" : "11"}');
-                    window.close();
+                    top.handleNote('{"option" : "11"}');
+                    top.dialog.get("edit").close();
                 }
 
             });
@@ -92,16 +94,14 @@
                     type:'GET',
                     title:'节点查询框',
                     onclose:function(){
-                        console.log(this.returnValue);
-                        window.opener.handleNote( this.returnValue );
-                        window.close();
+                        top.handleNote(this.returnValue);
+                        top.dialog.get("edit").close();
                     }
                 }).showModal();
             });
             $("#deletEle").click(function(){
-
-                        window.close();
-                        window.opener.handleNote('{"option" : "10"}');
+                top.handleNote('{"option" : "10"}');
+                top.dialog.get("edit").close();
             });
 
             //显示过长内容
@@ -112,6 +112,7 @@
                 document.getElementById('longContent').innerHTML = "节点内容：<br />"+longContent.replace(/\&lt\;br\/\&gt\;/g, "<br />");
             }
 
+            //判断是否有子导航
             $.ajax({
                 url:"/note/getNoteList",
                 type:'post',
@@ -121,11 +122,23 @@
                 contentType: "application/x-www-form-urlencoded; charset=utf-8",
                 data: {'rootId': $("#noteId").val()},
                 success:function(result){
-                    console.log(result);
                     if(result.length == 0){
                         $("#addChildNavigate").val("新增子导航");
                     }else{
                         $("#addChildNavigate").val("进入子导航");
+                    }
+                }
+            });
+
+            //有图片显示图片
+            $.ajax({
+                url:"/note/getNoteList",
+                dataType:'json',
+                data: {'noteId': $("#noteId").val()},
+                success:function(result){
+                    if(result.length > 0 && result[0].picPath != null && result[0].picPath != ''){
+                        //显示图片
+                        $("#imgDiv").append('<img style="width: 300px;height: 200px;" src="/note/downloadPic?noteId='+$("#noteId").val()+'">');
                     }
                 }
             });
@@ -145,11 +158,22 @@
             <td><input id="editNote" type="button" value="编辑节点"></td>
             <td><input id="delNote" type="button" value="删除节点"></td>
             <td><input id="saveAllNotes" type="button" value="保存所有节点信息"></td>
+        </tr>
+        <tr>
             <td><input id="addChildNavigate" type="button" value="新增子导航"></td>
             <td><input id="queryEle" type="button" value="查询元素"></td>
             <td><input id="deletEle" type="button" value="删除元素"></td>
         </tr>
     </table>
-<div id="longContent"></div>
+<div style="overflow-y: auto;height: 250px;" id="longContent"></div>
+<div id="imgDiv">
+
+    <form action="/note/upload" method="post" enctype="multipart/form-data" target="frameName">
+        选择图片<input type="file" name="file">
+        <input name="nodeId" type="hidden" th:value="${noteModel.noteId}">
+        <input type="submit" value="上传">
+    </form>
+    <iframe src="" frameborder="0" name="frameName" style=""></iframe>
+</div>
 </body>
 </html>

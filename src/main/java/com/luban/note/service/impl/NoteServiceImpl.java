@@ -61,4 +61,9 @@ public class NoteServiceImpl implements NoteService {
             noteDao.updateBatchNote(updateNoteList);
         }
     }
+
+    @Override
+    public void updatePicPath(NoteModel noteModel) {
+        noteDao.updatePicPath(noteModel);
+    }
 }

@@ -146,7 +146,18 @@
                     cy.on('tap', 'node', function(evt){
                         node = evt.target;
                         console.log( 'tapped ' + node.id() + 'x:'+node.position().x);
-                        var winObj = window.open('/note/toSelectOption?noteId=' + node.id());
+                        $(".tippy-popper").css("z-index","1");
+                        top.dialog({
+                            id: 'edit',
+                            url : '/note/toSelectOption?noteId=' + node.id(),
+                            width: 350,
+                            height:550,
+                            type:'GET',
+                            title:'操作选择框',
+                            onclose:function(){
+                                handleNote( this.returnValue );
+                            }
+                        }).show();
                     });
                 });
             }

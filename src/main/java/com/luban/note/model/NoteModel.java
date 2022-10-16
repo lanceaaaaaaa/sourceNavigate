@@ -15,6 +15,7 @@ public class NoteModel implements Serializable {
     private String rootId;
     private String contentEleId;
     private String queryContent;
+    private String picPath;
 
     public String getId() {
         return id;
@@ -102,5 +103,13 @@ public class NoteModel implements Serializable {
 
     public void setQueryContent(String queryContent) {
         this.queryContent = queryContent;
+    }
+
+    public String getPicPath() {
+        return picPath;
+    }
+
+    public void setPicPath(String picPath) {
+        this.picPath = picPath;
     }
 }

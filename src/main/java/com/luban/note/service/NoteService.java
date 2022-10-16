@@ -14,4 +14,6 @@ public interface NoteService {
     void delNote(NoteModel noteModel);
 
     void saveAllNotes(List<NoteModel> nodeList);
+
+    void updatePicPath(NoteModel noteModel);
 }
