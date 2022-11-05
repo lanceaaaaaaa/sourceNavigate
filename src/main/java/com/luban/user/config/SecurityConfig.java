@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
@@ -32,6 +33,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/", "/**").permitAll()
                 .and()
                 .formLogin().defaultSuccessUrl("/note/toMain", true)
+                .failureHandler(myAuthenticationFailureHandler())
                 .and()
                 .logout()
                 .and()
@@ -41,5 +43,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    public AuthenticationFailureHandler myAuthenticationFailureHandler(){
+        return new MyAuthenticationFailureHandler(userDetailsService);
     }
 }

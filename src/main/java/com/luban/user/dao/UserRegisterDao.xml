@@ -9,6 +9,10 @@
         <result column="update_time" property="updateTime" jdbcType="DATE" />
     </resultMap>
     <select id="selectUserByName" parameterType="java.lang.String" resultMap="BaseResultMap">
-        select id, name, password, create_time, update_time from user_register where status = 1 AND name = #{username}
+        select id, name, password, create_time, update_time,accountNonLocked from user_register where status = 1 AND name = #{username}
     </select>
+
+    <update id="updateLockedByUserId" parameterType="java.lang.String">
+        update user_register set accountNonLocked = 0 where name = #{username}
+    </update>
 </mapper>

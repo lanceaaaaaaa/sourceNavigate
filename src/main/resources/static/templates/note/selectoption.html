@@ -138,9 +138,35 @@
                 success:function(result){
                     if(result.length > 0 && result[0].picPath != null && result[0].picPath != ''){
                         //显示图片
-                        $("#imgDiv").append('<img style="width: 300px;height: 200px;" src="/note/downloadPic?noteId='+$("#noteId").val()+'">');
+                        $("#imgDiv").append('<img id="showPic" style="width: 300px;height: 200px;" src="/note/downloadPic?noteId='+$("#noteId").val()+'">');
                     }
                 }
+            });
+
+            //上传图片功能
+            $("#sentFile").click(function(){
+
+                // 【0】表示转换为原生的dom对象，使用files属性访问文件列表
+                var files = $('#fileId')[0].files
+                if(files.length <=0 ){
+                    return alert('请选择文件后再上传！')
+                }
+                // console.log('ok')
+                // 使用jQuery发起上传文件请求
+                var fd = new FormData()
+                fd.append('myFile',files[0])
+                $.ajax({
+                    type:'post',
+                    url:'/note/upload?nodeId='+$("#noteId").val(),
+                    data:fd,
+                    processData:false,
+                    contentType:false,
+                    success:function(res){
+                        console.log(res)
+                        alert("上传成功");
+                        $("#showPic").attr("src", "/note/downloadPic?noteId="+$("#noteId").val());
+                    }
+                })
             });
         });
 
@@ -165,15 +191,11 @@
             <td><input id="deletEle" type="button" value="删除元素"></td>
         </tr>
     </table>
-<div style="overflow-y: auto;height: 250px;" id="longContent"></div>
+<div style="overflow-y: auto;height: 200px;" id="longContent"></div>
 <div id="imgDiv">
-
-    <form action="/note/upload" method="post" enctype="multipart/form-data" target="frameName">
-        选择图片<input type="file" name="file">
+        选择图片<input type="file" id="fileId">
         <input name="nodeId" type="hidden" th:value="${noteModel.noteId}">
-        <input type="submit" value="上传">
-    </form>
-    <iframe src="" frameborder="0" name="frameName" style=""></iframe>
+        <button id="sentFile">上传</button>
 </div>
 </body>
 </html>

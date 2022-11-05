@@ -132,7 +132,7 @@ public class NoteController {
         MultipartHttpServletRequest r = (MultipartHttpServletRequest) req;
 
         // 获得具体文件,参数名与前端name属性一致
-        MultipartFile file = r.getFile("file");
+        MultipartFile file = r.getFile("myFile");
         // 确定服务器位置
         ServletContext servletContext = req.getServletContext();
         // 获得服务器/images文件路径,将来图片就存储在服务器的/images
