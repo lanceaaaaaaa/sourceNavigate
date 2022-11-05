@@ -1,6 +1,7 @@
 package com.luban.user.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.luban.common.VerifyCodeException;
 import com.luban.user.dao.UserRegisterDao;
 import com.luban.user.service.impl.UserDetailsServiceImpl;
 import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
@@ -57,6 +58,8 @@ public class MyAuthenticationFailureHandler extends SimpleUrlAuthenticationFailu
         if(exception instanceof LockedException){ //账户被锁定了
             errorMsg = "您已经多次登陆失败，账户已被锁定，请稍后再试！";
         }else if(exception instanceof SessionAuthenticationException){
+            errorMsg = exception.getMessage();
+        }else if(exception instanceof VerifyCodeException){
             errorMsg = exception.getMessage();
         }else{
             errorMsg = "请检查您的用户名和密码输入是否正确";

@@ -2,14 +2,33 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <script src="../js/jquery-2.2.3.min.js"></script>
     <title>登录</title>
+    <script>
+        $(function(){
+            $('#verifyCodeId').on('click', function() {
+                $.ajax({
+                    url:"/getVerifyCode",
+                    type:'get',
+                    cache:false,
+                    async: false,
+                    success:function(result){
+                        alert(result.message);
+                    }
+                });
+
+            });
+        });
+    </script>
 </head>
 <body>
 
 <form th:action="@{/login}" method="post">
     <p>用户名：<input type="text" name="username" required></p>
     <p>密码：<input type="password" name="password" required></p>
-    <p>验证码：<input type="text" name="verifyCode" required></p>
+    <p>验证码：<input type="text" name="verifyCode" required>
+    <button id="verifyCodeId">获取验证码</button>
+    </p>
     <input type="submit" value="提交">
 </form>
 </body>
