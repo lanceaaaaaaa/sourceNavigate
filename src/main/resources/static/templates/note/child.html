@@ -159,7 +159,9 @@
                             }
                         }).show();
                     });
+                    cy.fit();
                 });
+
             }
 
             function handleNote(returnValue) {
@@ -179,6 +181,7 @@
                             data: {'noteContent': jsonObj.content.replace(/\r\n/g,"<br/>"),'noteFrom': '','notex': noteX,'notey': noteY,'sourceId': node.id(),'targetId': '','rootId':'[[${noteModel.rootId}]]'},
                             success:function(result){
                                 alert(result.message);
+                                location.reload();
                             }
                         });
                         //编辑节点

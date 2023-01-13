@@ -146,6 +146,7 @@
                     }
                 }).show();
             });
+            cy.fit();
         });
     }
 
@@ -180,6 +181,7 @@
                             tippyAddNote = makeTippy(addNote, result.data.noteContent,result.data.contentEleId);
                         }
                         tippyAddNote.show();
+                        location.reload();
                     }
                 });
             //编辑节点
