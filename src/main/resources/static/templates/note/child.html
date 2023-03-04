@@ -69,9 +69,11 @@
                             contentType: "application/x-www-form-urlencoded; charset=utf-8",
                             data: {'noteContent': '','noteFrom': [[${noteModel.rootId}]],'notex': 100,'notey': 100,'sourceId': '','targetId': '','rootId':[[${noteModel.rootId}]]},
                             success:function(result){
+                                backupNoteInfo();
                                 location.reload([true]);
                             }
                         });
+
                     }else{
                         showNote(result);
                     }
@@ -180,10 +182,12 @@
                             contentType: "application/x-www-form-urlencoded; charset=utf-8",
                             data: {'noteContent': jsonObj.content.replace(/\r\n/g,"<br/>"),'noteFrom': '','notex': noteX,'notey': noteY,'sourceId': node.id(),'targetId': '','rootId':'[[${noteModel.rootId}]]'},
                             success:function(result){
+                                backupNoteInfo();
                                 alert(result.message);
                                 location.reload();
                             }
                         });
+
                         //编辑节点
                     }else if(jsonObj.option == '2'){
                         $.ajax({
@@ -195,9 +199,11 @@
                             contentType: "application/x-www-form-urlencoded; charset=utf-8",
                             data: {'noteContent': jsonObj.content.replace(/\r\n/g,"<br/>"),'noteId': node.id(),'noteFrom': '','notex': node.position().x,'notey': node.position().y,'targetId': ''},
                             success:function(result){
+                                backupNoteInfo();
                                 alert(result.message);
                             }
                         });
+
                         //删除节点
                     }else if(jsonObj.option == '3'){
                         $.ajax({
@@ -249,9 +255,11 @@
                             dataType:'json',
                             data: {'noteContent': node.id()+'-'+document.getElementById("div"+node.id().substring(1)).innerHTML+'-'+'root','noteFrom': '','notex': noteX,'notey': noteY,'sourceId': '','targetId': '','rootId':node.id()},
                             success:function(result){
+                                backupNoteInfo();
                                 window.location.href='/note/toChild?rootId='+node.id();
                             }
                         });
+
                     }else if(jsonObj.option == '11') {
                         window.location.href='/note/toChild?rootId='+node.id();
                     }

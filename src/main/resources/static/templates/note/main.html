@@ -168,6 +168,7 @@
                     data: {'noteContent': jsonObj.content.replace(/\r\n/g,"<br/>"),'noteFrom': '','notex': noteX,'notey': noteY,'sourceId': node.id(),'targetId': '','rootId':'n0'},
                     success:function(result){
                         //alert('id:'+result.data.noteId+'sourceid:'+node.id());
+                        debugger;
                         cy.add([
                             { group: 'nodes', data: { id: result.data.noteId}, position: { x: noteX, y: noteY }},
                             { group: 'edges', data: { id: result.data.noteId+node.id(), source: node.id(), target: result.data.noteId } }
@@ -181,9 +182,12 @@
                             tippyAddNote = makeTippy(addNote, result.data.noteContent,result.data.contentEleId);
                         }
                         tippyAddNote.show();
+                        backupNoteInfo();
+                        alert(result.message);
                         location.reload();
                     }
                 });
+
             //编辑节点
             }else if(jsonObj.option == '2'){
                 $.ajax({
@@ -203,8 +207,10 @@
                         }else{
                             document.getElementById("div"+node.id().substring(1)).innerHTML = '<p>'+result.data.noteContent+'</p>';
                         }
+                        backupNoteInfo();
                     }
                 });
+
             //删除节点
             }else if(jsonObj.option == '3'){
                 $.ajax({
@@ -268,10 +274,11 @@
                             tippyAddNote = makeTippy(addNote, result.data.noteContent,result.data.contentEleId);
                         }
                         tippyAddNote.show();
-
+                        backupNoteInfo();
                         window.location.href='/note/toChild?rootId='+node.id();
                     }
                 });
+
             }else if(jsonObj.option == '6'){
                 console.log(jsonObj);
                 toSelectNote(node.id(),jsonObj.noteId);

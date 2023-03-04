@@ -11,4 +11,6 @@ public interface TbBrandMapper {
 
     List<TbBrand> selectByExample(TbBrandExample example);
 
+    int selectByExample(int i);
+
 }

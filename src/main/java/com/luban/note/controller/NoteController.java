@@ -21,6 +21,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -79,6 +81,9 @@ public class NoteController {
     @ResponseBody
     public ResultModel saveOrUpdateNote(NoteModel noteModel){
         try {
+                if(StringUtils.isNoneBlank(noteModel.getNoteContent())){
+                    noteModel.setNoteContent(noteModel.getNoteContent().replaceAll(",","，"));
+                }
                 if(StringUtils.isNoneBlank(noteModel.getNoteId())){
                     noteService.updateNote(noteModel);
                 }else{
@@ -203,6 +208,29 @@ public class NoteController {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    @RequestMapping("backupNoteInfo")
+    @ResponseBody
+    public ResultModel backupNoteInfo(){
+        try {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd-hh-mm-ss");
+            String date = simpleDateFormat.format(new Date());
+
+            String backupSQL = "mysqldump -uroot -pqq15627276321 -t source_navigate1 --tables note_info -r /mysqlinstall/backup/"+ date + ".sql";
+            System.out.println("备份数据库SQL语句:" + backupSQL);
+            Process process = Runtime.getRuntime().exec(backupSQL);
+            int result = process.waitFor();
+            if (result == 0) {
+                System.out.println("备份成功");
+            } else {
+                System.out.println("备份失败:" + result);
+            }
+            return ResultModel.success("成功");
+        }catch(Exception ex){
+            ex.printStackTrace();
+            return ResultModel.error("失败");
         }
     }
 }

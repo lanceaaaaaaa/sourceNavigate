@@ -22,3 +22,21 @@ spring:
           socketFactoryClass: javax.net.ssl.SSLSocketFactory
         debug: true
     from: 2228026726@qq.com
+  datasource:
+    url: jdbc:mysql://192.168.79.10:3306/act5?useSSL=true
+    driver-class-name: com.mysql.jdbc.Driver
+    username: root
+    password: 123456
+
+    # activiti default configuration
+  activiti:
+    database-schema-update: true
+    check-process-definitions: true
+    process-definition-location-prefix: classpath:/processes/
+    #    process-definition-location-suffixes:
+    #      - **.bpmn
+    #      - **.bpmn20.xml
+    history-level: full
+
+server:
+  port: 19991
